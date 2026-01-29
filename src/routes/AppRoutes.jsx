@@ -18,6 +18,7 @@ import SellerOrders from '../pages/seller/SellerOrders'
 import AdminOrders from '../pages/admin/AdminOrders'
 import EditProduct from '../pages/seller/EditProduct'
 import AllProducts from '../pages/public/AllProducts'
+import CategoryProducts from '../pages/category/CategoryProducts'
 
 const AppRoutes = () => {
   return (
@@ -72,6 +73,9 @@ const AppRoutes = () => {
         <Route path="/allproducts" element={<AllProducts />} />
 
 
+
+
+<Route path="/products/category/:id" element={<CategoryProducts/>} />
 
 
 

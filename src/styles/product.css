@@ -142,3 +142,51 @@
     align-items: flex-start;
   }
 }
+
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #fecaca;
+}
+
+
+/* IMAGE WRAPPER */
+.product-image {
+  position: relative; /* ✅ REQUIRED */
+  height: 220px;
+  overflow: hidden;
+}
+
+/* STATUS BADGE FIX */
+.status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  background-color: white;
+}
+
+/* CATEGORY TAG */
+.product-category {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eef2ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}

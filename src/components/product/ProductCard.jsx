@@ -1,4 +1,4 @@
-import { FaShoppingCart, FaCheckCircle } from "react-icons/fa";
+import { FaShoppingCart, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
@@ -9,24 +9,35 @@ import "../../styles/product-card.css";
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
   const [showPopup, setShowPopup] = useState(false);
+  const [popupType, setPopupType] = useState("success"); // success | error | info
+  const [popupMessage, setPopupMessage] = useState("");
+
+  const openPopup = (type, message) => {
+    setPopupType(type);
+    setPopupMessage(message);
+    setShowPopup(true);
+  };
 
   const handleAddToCart = async () => {
     if (!user) {
-      alert("Please login to add items to cart");
+      openPopup("info", "Please login to add items to your cart.");
       return;
     }
 
     try {
       await addToCart(product.productId, user.id);
-      setShowPopup(true);
-
-      setTimeout(() => {
-        setShowPopup(false);
-      }, 2500);
+      openPopup(
+        "success",
+        `${product.productName} has been added to your cart successfully.`
+      );
     } catch (error) {
       console.error(error);
-      alert("Failed to add to cart");
+      openPopup(
+        "error",
+        "Failed to add product to cart. Please try again."
+      );
     }
   };
 
@@ -64,41 +75,60 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* CENTER MODAL POPUP */}
-{showPopup && (
-  <div className="cart-modal-overlay" onClick={() => setShowPopup(false)}>
-    <div
-      className="cart-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <FaCheckCircle className="modal-success-icon" />
+      {/* UNIVERSAL CENTER MODAL */}
+      {showPopup && (
+        <div className="cart-modal-overlay" onClick={() => setShowPopup(false)}>
+          <div
+            className={`cart-modal ${popupType}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {popupType === "success" && (
+              <FaCheckCircle className="modal-success-icon" />
+            )}
 
-      <h3>Added to Cart</h3>
+            {popupType !== "success" && (
+              <FaExclamationCircle className="modal-error-icon" />
+            )}
 
-      <p>
-        <strong>{product.productName}</strong> has been added
-        to your cart successfully.
-      </p>
+            <h3>
+              {popupType === "success"
+                ? "Added to Cart"
+                : popupType === "info"
+                ? "Login Required"
+                : "Something Went Wrong"}
+            </h3>
 
-      <div className="modal-actions">
-        <button
-          className="secondary-btn"
-          onClick={() => setShowPopup(false)}
-        >
-          Continue Shopping
-        </button>
+            <p>{popupMessage}</p>
 
-        <button
-          className="primary-btn"
-          onClick={() => navigate("/cart")}
-        >
-          View Cart
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="modal-actions">
+              <button
+                className="secondary-btn"
+                onClick={() => setShowPopup(false)}
+              >
+                Close
+              </button>
 
+              {popupType === "success" && (
+                <button
+                  className="primary-btn"
+                  onClick={() => navigate("/cart")}
+                >
+                  View Cart
+                </button>
+              )}
+
+              {popupType === "info" && (
+                <button
+                  className="primary-btn"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

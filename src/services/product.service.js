@@ -27,14 +27,20 @@ export const getProductById = (id) =>
    ====================== */
 
 // Seller sees only HIS products
+// export const getProductsByUser = (userId) =>
+//   api.get(`/users/${userId}/products`);
+
 export const getProductsByUser = (userId) =>
-  api.get(`/users/${userId}/products`);
+  api.get(`/products/seller/${userId}/active`);
+
 
 export const createProduct = (data) =>
   api.post("/products", data);
 
 export const updateProduct = (productId, data) =>
   api.put(`/products/${productId}`, data);
+
+
 
 
 /* ======================
@@ -45,11 +51,12 @@ export const updateProduct = (productId, data) =>
 export const getPendingProducts = () =>
   api.get("/products/status/PENDING");
 
-export const approveProduct = (productId) =>
+export const approveProduct = (productId) => 
   api.put(`/products/${productId}/status/APPROVED`);
 
 export const rejectProduct = (productId) =>
   api.put(`/products/${productId}/status/REJECTED`);
+
 
 
 
@@ -60,5 +67,9 @@ export const getAllProducts = () => {
 };
 
 export const getProductsByCategory = (categoryId) => {
-  return axios.get(`${BACKEND_URL}/api/products/category/${categoryId}`);
+  return axios.get(`${BACKEND_URL}/api/products/category/${categoryId}/status/APPROVED`);
+};
+
+export const deleteProduct = (id) => {
+  return api.delete(`/products/${id}`);
 };
