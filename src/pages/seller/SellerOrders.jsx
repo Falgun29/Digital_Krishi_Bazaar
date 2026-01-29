@@ -1,16 +1,22 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import {
-  getOrdersBySeller,
-  completeOrder
-} from "../../services/order.service";
-import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { getOrdersBySeller, completeOrder } from "../../services/order.service";
+import { FaCheckCircle, FaHistory } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "../../styles/order.css";
 import "../../styles/status.css";
-import "../../styles/product-card.css"; // reuse modal styles
+import "../../styles/product-card.css";
+
+const buyerStatus = (status) => {
+  if (status === "COMPLETED") return "DELIVERED";
+  return normalizeStatus(status);
+};
+
 
 const SellerOrders = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,58 +54,41 @@ const SellerOrders = () => {
 
   if (loading) return <p className="center">Loading seller orders...</p>;
 
-  if (orders.length === 0)
-    return <h3 className="center">No orders yet 📦</h3>;
+  const currentOrders = orders.filter(
+    o => o.orderStatus === "PENDING"
+  );
 
   return (
     <div className="container">
-      <h2 style={{ margin: "30px 0" }}>Orders for My Products</h2>
+      {/* ===== HEADER (INLINE FIXED) ===== */}
+      <div className="page-header">
+        <h2>Orders for My Products</h2>
 
-      <div className="order-list">
-        {orders.map(order => (
-          <div key={order.orderId} className="order-card">
-            <div className="order-header">
-              <div>
-                <b>Order #{order.orderId}</b>
-                <p>{new Date(order.orderDate).toLocaleString()}</p>
-                <small>Buyer: {order.buyerName}</small>
-              </div>
-
-              <span
-                className={`status-badge status-${order.orderStatus.toLowerCase()}`}
-              >
-                {order.orderStatus}
-              </span>
-            </div>
-
-            <div className="order-items">
-              {order.orderItems.map(item => (
-                <div key={item.orderItemId} className="order-item">
-                  <span>{item.productName}</span>
-                  <span>
-                    {item.quantity} × ₹{item.price}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="order-footer">
-              <h4>Total: ₹ {order.totalAmount}</h4>
-
-              {order.orderStatus === "PENDING" && (
-                <button
-                  className="primary-btn"
-                  onClick={() => openConfirmModal(order)}
-                >
-                  Mark as Completed
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+        <button
+          className="history-btn"
+          onClick={() => navigate("/seller/orders/history")}
+        >
+          <FaHistory /> Order History
+        </button>
       </div>
 
-      {/* CONFIRM COMPLETE MODAL */}
+      {/* ===== CURRENT ORDERS ===== */}
+      {currentOrders.length === 0 ? (
+        <p className="muted">No active orders.</p>
+      ) : (
+        <div className="order-list">
+          {currentOrders.map(order => (
+            <OrderCard
+              key={order.orderId}
+              order={order}
+              showAction
+              onComplete={() => openConfirmModal(order)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ===== CONFIRM COMPLETE MODAL ===== */}
       {showModal && selectedOrder && (
         <div className="cart-modal-overlay" onClick={() => setShowModal(false)}>
           <div
@@ -136,6 +125,51 @@ const SellerOrders = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+/* ===== ORDER CARD ===== */
+const OrderCard = ({ order, onComplete, showAction }) => {
+  return (
+    <div className="order-card">
+      <div className="order-header">
+        <div>
+          <b>Order #{order.orderId}</b>
+          <p>{new Date(order.orderDate).toLocaleString()}</p>
+          <small>Buyer: {order.buyerName}</small>
+        </div>
+
+        <span
+          className={`status-badge status-${order.orderStatus.toLowerCase()}`}
+        >
+          {order.orderStatus}
+        </span>
+      </div>
+
+      <div className="order-items">
+        {order.orderItems.map(item => (
+          <div key={item.orderItemId} className="order-item">
+            <span>{item.productName}</span>
+            <span>
+              {item.quantity} × ₹{item.price}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="order-footer">
+        <h4>Total: ₹ {order.totalAmount}</h4>
+
+        {showAction && (
+          <button
+            className="primary-btn"
+            onClick={onComplete}
+          >
+            Mark as Completed
+          </button>
+        )}
+      </div>
     </div>
   );
 };

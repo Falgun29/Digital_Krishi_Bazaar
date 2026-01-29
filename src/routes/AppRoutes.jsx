@@ -19,6 +19,7 @@ import AdminOrders from '../pages/admin/AdminOrders'
 import EditProduct from '../pages/seller/EditProduct'
 import AllProducts from '../pages/public/AllProducts'
 import CategoryProducts from '../pages/category/CategoryProducts'
+import SellerOrderHistory from '../pages/seller/SellerOrderHistory'
 
 const AppRoutes = () => {
   return (
@@ -71,6 +72,8 @@ const AppRoutes = () => {
         <Route path="/products" element={<Products />} />
         
         <Route path="/allproducts" element={<AllProducts />} />
+        <Route path="/seller/orders/history" element={<SellerOrderHistory />}/>
+
 
 
 
